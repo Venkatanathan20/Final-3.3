@@ -1,0 +1,291 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "Real-Time Telemetry & WHO Safety Alerts (0–3.3V / 0–12 UVI)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "max": 12,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#2ECC71", "value": null },
+              { "color": "#F1C40F", "value": 3 },
+              { "color": "#E67E22", "value": 6 },
+              { "color": "#E74C3C", "value": 8 },
+              { "color": "#9B59B6", "value": 11 }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": { "h": 7, "w": 6, "x": 0, "y": 1 },
+      "id": 1,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> filter(fn: (r) => r[\"_field\"] == \"uv_index_estimated\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Current UV Index (UVI)",
+      "type": "gauge"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 1,
+          "max": 3300,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#2ECC71", "value": null },
+              { "color": "#F1C40F", "value": 825 },
+              { "color": "#E67E22", "value": 1650 },
+              { "color": "#E74C3C", "value": 2200 },
+              { "color": "#9B59B6", "value": 3025 }
+            ]
+          },
+          "unit": "mvolt"
+        }
+      },
+      "gridPos": { "h": 7, "w": 6, "x": 6, "y": 1 },
+      "id": 2,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> filter(fn: (r) => r[\"_field\"] == \"voltage_hybrid_mv\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Hybrid Filtered Voltage (0–3300 mV)",
+      "type": "gauge"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#2ECC71", "value": null },
+              { "color": "#F1C40F", "value": 3 },
+              { "color": "#E67E22", "value": 6 },
+              { "color": "#E74C3C", "value": 8 },
+              { "color": "#9B59B6", "value": 11 }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 1 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value" },
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> filter(fn: (r) => r[\"_field\"] == \"uv_index_estimated\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Live UV Index (UVI)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "options": { "from": 0, "result": { "color": "#2ECC71", "index": 0, "text": "LOW — No Protection Needed" }, "to": 2.99 }, "type": "range" },
+            { "options": { "from": 3, "result": { "color": "#F1C40F", "index": 1, "text": "MODERATE — Wear Sunscreen" }, "to": 5.99 }, "type": "range" },
+            { "options": { "from": 6, "result": { "color": "#E67E22", "index": 2, "text": "HIGH — Seek Shade" }, "to": 7.99 }, "type": "range" },
+            { "options": { "from": 8, "result": { "color": "#E74C3C", "index": 3, "text": "VERY HIGH — Extra Protection" }, "to": 10.99 }, "type": "range" },
+            { "options": { "from": 11, "result": { "color": "#9B59B6", "index": 4, "text": "EXTREME — Stay Indoors" }, "to": 15 }, "type": "range" }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#2ECC71", "value": null },
+              { "color": "#F1C40F", "value": 3 },
+              { "color": "#E67E22", "value": 6 },
+              { "color": "#E74C3C", "value": 8 },
+              { "color": "#9B59B6", "value": 11 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 5, "w": 12, "x": 0, "y": 8 },
+      "id": 4,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["lastNotNull"] }, "textMode": "value" },
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> filter(fn: (r) => r[\"_field\"] == \"uv_index_estimated\")\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "UV Health Risk (WHO Scale)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#2ECC71", "value": null },
+              { "color": "#F1C40F", "value": 3 },
+              { "color": "#E67E22", "value": 6 },
+              { "color": "#E74C3C", "value": 8 },
+              { "color": "#9B59B6", "value": 11 }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": { "h": 5, "w": 12, "x": 12, "y": 8 },
+      "id": 5,
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": { "calcs": ["max"] }, "textMode": "value" },
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> filter(fn: (r) => r[\"_field\"] == \"uv_index_estimated\")\n  |> max()",
+          "refId": "A"
+        }
+      ],
+      "title": "Peak UV — Last 24h (UVI)",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "id": 101,
+      "title": "Historical Trends, DSP Filter Benchmark & Peak Analysis",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "fillOpacity": 18, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never" }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "uv_index_estimated" },
+            "properties": [
+              { "id": "displayName", "value": "Calibrated UV Index (UVI)" },
+              { "id": "color", "value": { "fixedColor": "#00F5D4", "mode": "fixed" } },
+              { "id": "custom.axisPlacement", "value": "left" },
+              { "id": "min", "value": 0 },
+              { "id": "max", "value": 12 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "voltage_hybrid_mv" },
+            "properties": [
+              { "id": "displayName", "value": "Hybrid Filtered (mV)" },
+              { "id": "color", "value": { "fixedColor": "#F1C40F", "mode": "fixed" } },
+              { "id": "unit", "value": "mvolt" },
+              { "id": "custom.axisPlacement", "value": "right" },
+              { "id": "min", "value": 0 },
+              { "id": "max", "value": 3300 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "voltage_raw_mv" },
+            "properties": [
+              { "id": "displayName", "value": "Raw Unfiltered (mV)" },
+              { "id": "color", "value": { "fixedColor": "#FF4D6D", "mode": "fixed" } },
+              { "id": "unit", "value": "mvolt" },
+              { "id": "custom.axisPlacement", "value": "right" },
+              { "id": "custom.lineStyle", "value": { "dash": [6, 6], "fill": "dash" } }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 9, "w": 14, "x": 0, "y": 14 },
+      "id": 6,
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> filter(fn: (r) => r[\"_field\"] == \"uv_index_estimated\" or r[\"_field\"] == \"voltage_hybrid_mv\" or r[\"_field\"] == \"voltage_raw_mv\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"mean\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Live UV Index & 3-Tier DSP Voltage (Filtered vs Raw)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2,
+          "max": 12,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "#2ECC71", "value": null },
+              { "color": "#F1C40F", "value": 3 },
+              { "color": "#E67E22", "value": 6 },
+              { "color": "#E74C3C", "value": 8 },
+              { "color": "#9B59B6", "value": 11 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 9, "w": 10, "x": 14, "y": 14 },
+      "id": 7,
+      "options": { "orientation": "vertical", "xTickLabelRotation": 0 },
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: -7d)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> filter(fn: (r) => r[\"_field\"] == \"uv_index_estimated\")\n  |> aggregateWindow(every: 1d, fn: max, createEmpty: false)",
+          "refId": "A"
+        }
+      ],
+      "title": "Daily Peak UV — Last 7 Days",
+      "type": "barchart"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 102,
+      "title": "Node Diagnostics & Uptime",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "influxdb" },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 24 },
+      "id": 8,
+      "targets": [
+        {
+          "query": "from(bucket: \"uv_sensor_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"uv_measurement\")\n  |> filter(fn: (r) => r[\"device\"] == \"ESP32_node_01\")\n  |> last()\n  |> pivot(rowKey:[\"_time\", \"device\"], columnKey: [\"_field\"], valueColumn: \"_value\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Latest Reading Per Node (ESP32_node_01)",
+      "type": "table"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["ESP32-C3", "UV-Monitor", "NTUST", "0-3.3V"],
+  "time": { "from": "now-15m", "to": "now" },
+  "title": "ESP32-C3 Physical UV Sensor Dashboard (0–3.3V / 0–12 UVI)",
+  "uid": "esp32-c3-uv-final-3v3"
+}
