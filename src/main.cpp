@@ -154,7 +154,7 @@ void updateFiltersAndSensors() {
   }
   currentMvMedian = sorted[winCount / 2];
 
-  // Stage 2 & 3: 1D Kalman & Hybrid (Median + Kalman) State Estimation
+  // Stage 2 (Raw -> Kalman) & Stage 3 (Raw -> Median -> Hybrid Kalman) Parallel Branches
   if (clampedRaw == 0.0f && currentMvMedian == 0.0f) {
     kalX = 0.0f;                             // Instant zero-reset when sensor is covered
     hybX = 0.0f;
@@ -277,6 +277,8 @@ void publishToInfluxDb() {
 
     String lineProtocol = String("uv_measurement,device=") + DEVICE_ID + " ";
     lineProtocol += "voltage_raw_mv=" + String(currentMvRaw, 2) + ",";
+    lineProtocol += "voltage_median_mv=" + String(currentMvMedian, 2) + ",";
+    lineProtocol += "voltage_kalman_mv=" + String(currentMvKalman, 2) + ",";
     lineProtocol += "voltage_hybrid_mv=" + String(currentMvHybrid, 2) + ",";
     lineProtocol += "uv_index_estimated=" + String(currentUvIndex, 3);
 
@@ -339,10 +341,13 @@ void loop() {
     // Step 1: Acquire ADC reading and run 3-tier DSP filters
     updateFiltersAndSensors();
 
-    // Step 2: Serialize and broadcast live JSON packet to HiveMQ MQTT
+    // Step 2: Serialize and broadcast all 3 parallel filter paths to HiveMQ MQTT
     JsonDocument doc;
     doc["seq"]                = packetSeq;
     doc["device_id"]          = DEVICE_ID;
+    doc["mv_raw"]             = serialized(String(currentMvRaw, 2));
+    doc["mv_median"]          = serialized(String(currentMvMedian, 2));
+    doc["mv_kalman"]          = serialized(String(currentMvKalman, 2));
     doc["mv_hybrid"]          = serialized(String(currentMvHybrid, 2));
     doc["uv_index_estimated"] = serialized(String(currentUvIndex, 3));
     doc["risk_category"]      = currentRisk;
