@@ -1,0 +1,42 @@
+name: Build Final 3.3V UV Monitor APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter 3.24.5
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: 'stable'
+
+      - name: Regenerate Clean Android Wrapper & Build Release APK
+        working-directory: ./mobile_app
+        run: |
+          rm -rf android test lib/*.dart
+          flutter create --platforms=android --org com.ntust.uvmonitor .
+          rm -rf test
+          sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET"\/><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"\/><application android:usesCleartextTraffic="true"/g' android/app/src/main/AndroidManifest.xml
+          cp ../app1.dart lib/main.dart
+          flutter pub get
+          flutter build apk --release -t lib/main.dart
+
+      - name: Upload Compiled APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Final-3.3V-UV-Monitor-APK
+          path: mobile_app/build/app/outputs/flutter-apk/app-release.apk
