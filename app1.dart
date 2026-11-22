@@ -764,7 +764,7 @@ from(bucket: "$_influxBucket")
     final double whiteNoise = (rng.nextDouble() - 0.5) * 90.0;
     final double wifiSpike = (rng.nextInt(5) == 0) ? 450.0 : 0.0;
     final double raw = (solarBell + whiteNoise + wifiSpike).clamp(0.0, 3300.0);
-    _compute3FiltersLocallyAndRecord(raw, -49, source: 'WHO Curve Demo');
+    _compute3FiltersLocallyAndRecord(raw, -49, source: 'Curve Demo');
   }
 
   Future<void> _showPhoneStyleWiFiDialog() async {
@@ -1246,7 +1246,7 @@ from(bucket: "$_influxBucket")
 
       _drawCanvasText(
         canvas,
-        'World Health Organization UVI — Full Historical Graph ($_selectedFilter • $_graphGranularity)',
+        'UVI — Full Historical Graph ($_selectedFilter • $_graphGranularity)',
         const Offset(padLeft, 36),
         fontSize: 28,
         fontWeight: FontWeight.bold,
@@ -1389,7 +1389,7 @@ from(bucket: "$_influxBucket")
           '${dir.path}/full_uv_gradient_graph_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
       await Share.shareXFiles(<XFile>[XFile(file.path)],
-          text: 'Full High-Res WHO UV Index Gradient Graph ($_selectedFilter)');
+          text: 'UV Index Graph ($_selectedFilter)');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -1804,7 +1804,7 @@ from(bucket: "$_influxBucket")
                                 ],
                               ),
                               Text(
-                                'WHO UVI (0-3.3V Scale) • Swipe graph left/right',
+                                'UVI (0-3.3V Scale) • Swipe graph left/right',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -1875,7 +1875,7 @@ from(bucket: "$_influxBucket")
                       child: chartPoints.isEmpty
                           ? Center(
                               child: Text(
-                                'Tap "Demo" or "Connect" to view the live WHO UV Gradient Curve.',
+                                'Tap "Demo" or "Connect" to view the live UV Index Graph.',
                                 style: TextStyle(
                                     color: secondaryText, fontSize: 12),
                               ),
@@ -2532,7 +2532,7 @@ from(bucket: "$_influxBucket")
                     ),
                     const Divider(height: 22),
                     Text(
-                      "The World Health Organization's UV index (UVI) measures ultraviolet radiation. The higher the UVI, the greater the potential for skin and eye damage, and the faster harm can occur.",
+                      "The UV index (UVI) measures ultraviolet radiation. The higher the UVI, the greater the potential for skin and eye damage, and the faster harm can occur.",
                       style: TextStyle(fontSize: 11, color: secondaryText),
                     ),
                     const SizedBox(height: 10),
@@ -2844,7 +2844,7 @@ from(bucket: "$_influxBucket")
                         onPressed: _exportFullCanvasGraphPng,
                         icon: const Icon(Icons.image_outlined, size: 18),
                         label: const Text(
-                          'Export Full Unclipped WHO Gradient Graph (High-Res PNG)',
+                          'Export Full Unclipped Graph (High-Res PNG)',
                           style: TextStyle(
                               fontSize: 11, fontWeight: FontWeight.bold),
                         ),
